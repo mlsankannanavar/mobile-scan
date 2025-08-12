@@ -3,7 +3,7 @@ class Constants {
   // Replace 192.168.1.XXX with your computer's actual IP address
   // Or use the original remote server for testing
   static const String baseUrl = 'https://test-backend-batchmate.medha-analytics.ai';
-  static const String healthEndpoint = '/health';
+  static const String healthEndpoint = '/api/mobile/health';
   static const String filteredBatchesEndpoint = '/api/filtered-batches';
   static const String submitMobileBatchEndpoint = '/api/submit-mobile-batch';
   
