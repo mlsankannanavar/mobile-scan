@@ -5,7 +5,6 @@ import 'package:path/path.dart';
 import '../models/batch_info.dart';
 import '../models/session_data.dart';
 import '../utils/logger.dart';
-import '../utils/constants.dart';
 
 class LocalStorageService {
   static Database? _database;
