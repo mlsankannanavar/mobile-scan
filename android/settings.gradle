@@ -10,6 +10,12 @@ pluginManagement {
     }()
 
     includeBuild("$flutterSdkPath/packages/flutter_tools/gradle")
+
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
 }
 
 plugins {
@@ -17,11 +23,6 @@ plugins {
 }
 
 include ':app'
-
-apply from: new File(
-  settings.pluginManagement.includeBuild.destination,
-  "flutter_plugin_loader.gradle"
-)
 
 def localPropertiesFile = new File(rootProject.projectDir, "local.properties")
 def properties = new Properties()
