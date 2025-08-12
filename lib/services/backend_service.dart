@@ -32,6 +32,17 @@ class BackendService {
     _client.close();
   }
   
+  /// Get default headers for mobile requests
+  Map<String, String> get _defaultHeaders => {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+    'User-Agent': 'BatchMate-Mobile/1.0.0 (Android; Flutter)',
+    'X-Requested-With': 'BatchMate-Mobile',
+    'X-Client-Type': 'mobile-app',
+    'X-Client-Platform': 'android',
+    'Cache-Control': 'no-cache',
+  };
+  
   /// Test server connection and get health status
   Future<bool> testConnection() async {
     try {
@@ -41,7 +52,7 @@ class BackendService {
       final response = await _client
           .get(
             Uri.parse('$_baseUrl${Constants.healthEndpoint}'),
-            headers: {'Content-Type': 'application/json'},
+            headers: _defaultHeaders,
           )
           .timeout(_timeout);
           
@@ -84,7 +95,7 @@ class BackendService {
       final response = await _client
           .get(
             Uri.parse('$_baseUrl${Constants.filteredBatchesEndpoint}/$sessionId'),
-            headers: {'Content-Type': 'application/json'},
+            headers: _defaultHeaders,
           )
           .timeout(_timeout);
           
@@ -190,7 +201,7 @@ class BackendService {
       final response = await _client
           .post(
             Uri.parse('$_baseUrl${Constants.submitMobileBatchEndpoint}/$sessionId'),
-            headers: {'Content-Type': 'application/json'},
+            headers: _defaultHeaders,
             body: json.encode(requestBody),
           )
           .timeout(_timeout);
@@ -240,7 +251,7 @@ class BackendService {
       final response = await _client
           .get(
             Uri.parse('$_baseUrl${Constants.healthEndpoint}'),
-            headers: {'Content-Type': 'application/json'},
+            headers: _defaultHeaders,
           )
           .timeout(_timeout);
           

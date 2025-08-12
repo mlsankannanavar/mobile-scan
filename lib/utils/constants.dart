@@ -1,6 +1,6 @@
 class Constants {
-  // Server Configuration
-  static const String baseUrl = 'https://test-backend-batchmate.medha-analytics.ai';
+  // Server Configuration - Local Development
+  static const String baseUrl = 'http://localhost:5000';
   static const String healthEndpoint = '/health';
   static const String filteredBatchesEndpoint = '/api/filtered-batches';
   static const String submitMobileBatchEndpoint = '/api/submit-mobile-batch';
