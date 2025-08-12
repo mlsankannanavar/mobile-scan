@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
 import '../utils/logger.dart';
 import '../utils/constants.dart';
 
@@ -13,6 +14,8 @@ class QRScannerScreen extends ConsumerStatefulWidget {
 class _QRScannerScreenState extends ConsumerState<QRScannerScreen> {
   String? scannedSessionId;
   bool isLoading = false;
+  bool showScanner = false;
+  MobileScannerController cameraController = MobileScannerController();
 
   @override
   void initState() {
@@ -20,9 +23,39 @@ class _QRScannerScreenState extends ConsumerState<QRScannerScreen> {
     AppLogger.info('QR Scanner screen opened');
   }
 
+  @override
+  void dispose() {
+    cameraController.dispose();
+    super.dispose();
+  }
+
+  void _startQRScan() {
+    setState(() {
+      showScanner = true;
+    });
+  }
+
+  void _onQRDetected(BarcodeCapture capture) {
+    final List<Barcode> barcodes = capture.barcodes;
+    if (barcodes.isNotEmpty && scannedSessionId == null) {
+      final String? code = barcodes.first.rawValue;
+      if (code != null) {
+        setState(() {
+          scannedSessionId = code;
+          showScanner = false;
+        });
+        
+        AppLogger.info('QR Code scanned', details: {
+          'sessionId': code,
+        });
+        
+        _downloadBatchData();
+      }
+    }
+  }
+
   void _simulateQRScan() {
-    // This is a placeholder for QR scanning functionality
-    // In a real implementation, this would use qr_code_scanner package
+    // Fallback simulation for testing
     setState(() {
       scannedSessionId = 'TEST_SESSION_${DateTime.now().millisecondsSinceEpoch}';
     });
@@ -77,7 +110,69 @@ class _QRScannerScreenState extends ConsumerState<QRScannerScreen> {
         padding: const EdgeInsets.all(Constants.defaultPadding),
         child: Column(
           children: [
-            if (scannedSessionId == null) ...[
+            if (showScanner) ...[
+              // Real QR Scanner
+              Expanded(
+                child: Column(
+                  children: [
+                    Text(
+                      'Scan QR Code',
+                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: Constants.defaultPadding),
+                    Expanded(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.blue, width: 2),
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: MobileScanner(
+                            controller: cameraController,
+                            onDetect: _onQRDetected,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: Constants.defaultPadding),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: ElevatedButton.icon(
+                            onPressed: () {
+                              setState(() {
+                                showScanner = false;
+                              });
+                            },
+                            icon: const Icon(Icons.close),
+                            label: const Text('Cancel'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.grey,
+                              foregroundColor: Colors.white,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: Constants.defaultPadding),
+                        Expanded(
+                          child: ElevatedButton.icon(
+                            onPressed: _simulateQRScan,
+                            icon: const Icon(Icons.science),
+                            label: const Text('Simulate'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.orange,
+                              foregroundColor: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ] else if (scannedSessionId == null) ...[
               // QR Scanner Instructions
               Expanded(
                 child: Column(
@@ -110,14 +205,32 @@ class _QRScannerScreenState extends ConsumerState<QRScannerScreen> {
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: Constants.largePadding),
-                    ElevatedButton.icon(
-                      onPressed: _simulateQRScan,
-                      icon: const Icon(Icons.qr_code),
-                      label: const Text('Simulate QR Scan'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue,
-                        foregroundColor: Colors.white,
-                      ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: ElevatedButton.icon(
+                            onPressed: _startQRScan,
+                            icon: const Icon(Icons.qr_code_scanner),
+                            label: const Text('Scan QR Code'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.blue,
+                              foregroundColor: Colors.white,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: Constants.defaultPadding),
+                        Expanded(
+                          child: ElevatedButton.icon(
+                            onPressed: _simulateQRScan,
+                            icon: const Icon(Icons.science),
+                            label: const Text('Simulate'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.orange,
+                              foregroundColor: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),

@@ -14,8 +14,8 @@ dependencies:
   # HTTP client
   http: ^1.1.0
   
-  # QR code scanning
-  qr_code_scanner: ^1.0.1
+  # QR code scanning (compatible with AGP 8.x)
+  mobile_scanner: ^5.0.0
   
   # Camera functionality
   camera: ^0.10.4
