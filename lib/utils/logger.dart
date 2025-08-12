@@ -1,21 +1,40 @@
 import 'package:flutter/foundation.dart';
-import 'package:freezed_annotation/freezed_annotation.dart';
-
-part 'logger.freezed.dart';
-part 'logger.g.dart';
 
 enum LogLevel { info, warning, error, debug }
 
-@freezed
-class LogEntry with _$LogEntry {
-  const factory LogEntry({
-    required DateTime timestamp,
-    required LogLevel level,
-    required String message,
-    Map<String, dynamic>? details,
-  }) = _LogEntry;
-  
-  factory LogEntry.fromJson(Map<String, dynamic> json) => _$LogEntryFromJson(json);
+class LogEntry {
+  final DateTime timestamp;
+  final LogLevel level;
+  final String message;
+  final Map<String, dynamic>? details;
+
+  const LogEntry({
+    required this.timestamp,
+    required this.level,
+    required this.message,
+    this.details,
+  });
+
+  factory LogEntry.fromJson(Map<String, dynamic> json) {
+    return LogEntry(
+      timestamp: DateTime.parse(json['timestamp']),
+      level: LogLevel.values.firstWhere(
+        (e) => e.name == json['level'],
+        orElse: () => LogLevel.info,
+      ),
+      message: json['message'] ?? '',
+      details: json['details'] != null 
+          ? Map<String, dynamic>.from(json['details'])
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'timestamp': timestamp.toIso8601String(),
+    'level': level.name,
+    'message': message,
+    'details': details,
+  };
 }
 
 class AppLogger {

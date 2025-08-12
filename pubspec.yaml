@@ -39,8 +39,7 @@ dependencies:
   # State management
   flutter_riverpod: ^2.4.5
   
-  # Code generation
-  freezed_annotation: ^2.4.1
+  # JSON handling
   json_annotation: ^4.9.0
   
   # Path utilities
@@ -59,10 +58,10 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
 
-  # Code generation tools
-  build_runner: ^2.4.7
-  freezed: ^2.4.6
-  json_serializable: ^6.7.1
+  # Code generation tools (if needed later)
+  # build_runner: ^2.4.7
+  # freezed: ^2.4.6
+  # json_serializable: ^6.7.1
 
   # Linting
   flutter_lints: ^2.0.0

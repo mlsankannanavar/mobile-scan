@@ -1,36 +1,84 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
+class ApiResponse<T> {
+  final bool success;
+  final String? message;
+  final T? data;
+  final String? error;
+  final int? statusCode;
 
-part 'api_response.freezed.dart';
-part 'api_response.g.dart';
+  const ApiResponse({
+    required this.success,
+    this.message,
+    this.data,
+    this.error,
+    this.statusCode,
+  });
 
-@Freezed(genericArgumentFactories: true)
-class ApiResponse<T> with _$ApiResponse<T> {
-  const factory ApiResponse({
-    required bool success,
-    String? message,
-    T? data,
-    String? error,
-    int? statusCode,
-  }) = _ApiResponse<T>;
-  
   factory ApiResponse.fromJson(
     Map<String, dynamic> json,
-    T Function(Object?) fromJsonT,
-  ) => _$ApiResponseFromJson(json, fromJsonT);
+    T Function(Map<String, dynamic>)? fromJsonT,
+  ) {
+    return ApiResponse<T>(
+      success: json['success'] ?? false,
+      message: json['message'],
+      data: json['data'] != null && fromJsonT != null 
+          ? fromJsonT(json['data']) 
+          : json['data'],
+      error: json['error'],
+      statusCode: json['statusCode'],
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'success': success,
+    'message': message,
+    'data': data,
+    'error': error,
+    'statusCode': statusCode,
+  };
 }
 
-@freezed
-class HealthCheckResponse with _$HealthCheckResponse {
-  const factory HealthCheckResponse({
-    required String status,
-    required String timestamp,
-    required int activeSessions,
-    required bool databaseConnected,
-    required String databricksStatus,
-    required bool mobileSupport,
-    required String serverVersion,
-    required Map<String, bool> features,
-  }) = _HealthCheckResponse;
-  
-  factory HealthCheckResponse.fromJson(Map<String, dynamic> json) => _$HealthCheckResponseFromJson(json);
+class HealthCheckResponse {
+  final String status;
+  final String timestamp;
+  final int activeSessions;
+  final bool databaseConnected;
+  final String databricksStatus;
+  final bool mobileSupport;
+  final String serverVersion;
+  final Map<String, bool> features;
+
+  const HealthCheckResponse({
+    required this.status,
+    required this.timestamp,
+    required this.activeSessions,
+    required this.databaseConnected,
+    required this.databricksStatus,
+    required this.mobileSupport,
+    required this.serverVersion,
+    required this.features,
+  });
+
+  factory HealthCheckResponse.fromJson(Map<String, dynamic> json) {
+    return HealthCheckResponse(
+      status: json['status'] ?? '',
+      timestamp: json['timestamp'] ?? '',
+      activeSessions: json['activeSessions'] ?? 0,
+      databaseConnected: json['databaseConnected'] ?? false,
+      databricksStatus: json['databricksStatus'] ?? '',
+      mobileSupport: json['mobileSupport'] ?? false,
+      serverVersion: json['serverVersion'] ?? '',
+      features: Map<String, bool>.from(json['features'] ?? {}),
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'status': status,
+    'timestamp': timestamp,
+    'activeSessions': activeSessions,
+    'databaseConnected': databaseConnected,
+    'databricksStatus': databricksStatus,
+    'mobileSupport': mobileSupport,
+    'serverVersion': serverVersion,
+    'features': features,
+  };
 }
