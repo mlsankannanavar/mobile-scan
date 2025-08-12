@@ -6,7 +6,6 @@ import 'package:batch_scanner_mobile/services/services.dart';
 import '../models/batch_info.dart';
 import '../models/match_result.dart';
 import '../utils/logger.dart';
-import '../services/ocr_service.dart';
 
 class ImageScannerScreen extends ConsumerStatefulWidget {
   @override
