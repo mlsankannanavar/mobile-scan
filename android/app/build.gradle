@@ -1,7 +1,7 @@
 plugins {
     id "com.android.application"
     id "kotlin-android"
-    id "dev.flutter.flutter-gradle-plugin"
+    // Remove the flutter plugin line - it will be applied via legacy method
 }
 
 def localProperties = new Properties()
@@ -22,9 +22,14 @@ if (flutterVersionName == null) {
     flutterVersionName = '1.0'
 }
 
+// Apply Flutter plugin using legacy method for compatibility
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
+
 android {
     namespace "com.batchmate.scanner"   
-    compileSdk 35
+    compileSdk 34  // Downgrade for compatibility
     
 
     compileOptions {
@@ -43,7 +48,7 @@ android {
     defaultConfig {
         applicationId "com.batchmate.scanner"
         minSdkVersion 21
-        targetSdkVersion 35
+        targetSdkVersion 34  // Match compileSdk
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         multiDexEnabled true
