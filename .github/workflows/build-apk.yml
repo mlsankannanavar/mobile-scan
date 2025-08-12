@@ -1,0 +1,123 @@
+name: Build and Release APK
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  release:
+    types: [ published ]
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'zulu'
+        java-version: '17'
+        
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.24.0'
+        channel: 'stable'
+        
+    - name: Get dependencies
+      run: flutter pub get
+      
+    - name: Run code generation
+      run: flutter packages pub run build_runner build --delete-conflicting-outputs
+      
+    - name: Analyze code
+      run: flutter analyze
+      
+    - name: Run tests
+      run: flutter test
+      continue-on-error: true
+      
+    - name: Build APK (Debug)
+      run: flutter build apk --debug
+      
+    - name: Build APK (Release)
+      run: flutter build apk --release
+      
+    - name: Build App Bundle (Release)
+      run: flutter build appbundle --release
+      
+    - name: Upload Debug APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: debug-apk
+        path: build/app/outputs/flutter-apk/app-debug.apk
+        
+    - name: Upload Release APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: release-apk
+        path: build/app/outputs/flutter-apk/app-release.apk
+        
+    - name: Upload App Bundle
+      uses: actions/upload-artifact@v4
+      with:
+        name: app-bundle
+        path: build/app/outputs/bundle/release/app-release.aab
+        
+    # Create release if this is a tag push
+    - name: Create Release
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          build/app/outputs/flutter-apk/app-release.apk
+          build/app/outputs/bundle/release/app-release.aab
+        name: Release ${{ github.ref_name }}
+        body: |
+          ## BatchMate Scanner Release ${{ github.ref_name }}
+          
+          ### Features
+          - Mobile batch scanning with OCR
+          - Local batch matching
+          - Server integration
+          - Comprehensive logging
+          
+          ### Downloads
+          - **APK**: Direct installation on Android devices
+          - **AAB**: For Google Play Store distribution
+          
+          ### Installation
+          1. Download the APK file
+          2. Enable "Unknown sources" in Android settings
+          3. Install the APK
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-ios:
+    runs-on: macos-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.24.0'
+        channel: 'stable'
+        
+    - name: Get dependencies
+      run: flutter pub get
+      
+    - name: Run code generation
+      run: flutter packages pub run build_runner build --delete-conflicting-outputs
+      
+    - name: Build iOS (No Codesign)
+      run: flutter build ios --release --no-codesign
+      continue-on-error: true

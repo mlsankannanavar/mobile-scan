@@ -1,0 +1,26 @@
+include: package:flutter_lints/flutter.yaml
+
+linter:
+  rules:
+    # Avoid print statements in production code
+    avoid_print: true
+    
+    # Prefer const constructors
+    prefer_const_constructors: true
+    prefer_const_literals_to_create_immutables: true
+    
+    # Dart style guide
+    prefer_single_quotes: true
+    avoid_unnecessary_containers: true
+    sized_box_for_whitespace: true
+    
+    # Error prevention
+    avoid_init_to_null: true
+    avoid_return_types_on_setters: true
+    avoid_types_as_parameter_names: true
+    
+    # Documentation
+    public_member_api_docs: false
+    
+    # Formatting
+    lines_longer_than_80_chars: false

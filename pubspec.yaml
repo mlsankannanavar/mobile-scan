@@ -1,0 +1,79 @@
+name: batch_scanner_mobile
+description: A mobile batch scanner app for pharmaceutical inventory management.
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.1.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # HTTP client
+  http: ^1.1.0
+  
+  # QR code scanning
+  qr_code_scanner: ^1.0.1
+  
+  # Camera functionality
+  camera: ^0.10.5+5
+  
+  # ML Kit for text recognition
+  google_mlkit_text_recognition: ^0.9.0
+  
+  # Local database
+  sqflite: ^2.3.0
+  
+  # Local storage
+  shared_preferences: ^2.2.2
+  path_provider: ^2.1.1
+  
+  # Permissions
+  permission_handler: ^11.0.1
+  
+  # Image picking
+  image_picker: ^1.0.4
+  
+  # State management
+  flutter_riverpod: ^2.4.5
+  
+  # Code generation
+  freezed: ^2.4.6
+  json_annotation: ^4.8.1
+  
+  # String matching (for local batch matching)
+  fuzzywuzzy: ^1.1.6
+  
+  # Date formatting
+  intl: ^0.18.1
+  
+  # Material design icons
+  cupertino_icons: ^1.0.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  # Code generation tools
+  build_runner: ^2.4.7
+  freezed: ^2.4.6
+  json_serializable: ^6.7.1
+
+  # Linting
+  flutter_lints: ^2.0.0
+
+flutter:
+  uses-material-design: true
+
+  # Assets
+  assets:
+    - assets/images/
+    - assets/icons/
+
+  # App icon
+  # flutter_icons:
+  #   android: "launcher_icon"
+  #   ios: true
+  #   image_path: "assets/icons/app_icon.png"
