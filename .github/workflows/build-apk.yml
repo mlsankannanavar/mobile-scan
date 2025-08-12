@@ -30,6 +30,11 @@ jobs:
         
     - name: Setup Android SDK
       run: |
+        # Install Android SDK 35 and required components
+        $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "platforms;android-35"
+        $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "build-tools;35.0.0"
+        $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "platform-tools"
+        $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses
         flutter config --android-sdk $ANDROID_SDK_ROOT
         flutter doctor --verbose
         
