@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'screens/main_screen.dart';
-import 'services/local_storage_service.dart';
-import 'utils/logger.dart';
+import 'package:batch_scanner_mobile/screens/main_screen.dart';
+import 'package:batch_scanner_mobile/services/local_storage_service.dart';
+import 'package:batch_scanner_mobile/utils/logger.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
