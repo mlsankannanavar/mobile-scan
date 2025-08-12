@@ -23,16 +23,20 @@ class _MainScreenState extends ConsumerState<MainScreen> {
   String _statusMessage = 'Not connected to server';
   String _serverInfo = '';
 
-  @override
+ @override
   void initState() {
     super.initState();
     AppLogger.info('[MAIN] Main screen initialized');
     _testConnection();
   }
-
+  
   Future<void> _testConnection() async {
-    setState(() {
+    // Fix: Delay provider modification to avoid build-time conflicts
+    Future.microtask(() {
       ref.read(connectionStatusProvider.notifier).state = ConnectionStatus.connecting;
+    });
+    
+    setState(() {
       _statusMessage = 'Testing connection...';
     });
 
