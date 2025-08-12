@@ -27,6 +27,7 @@ jobs:
       with:
         flutter-version: '3.24.0'
         channel: 'stable'
+        cache: true
         
     - name: Create local.properties
       run: |
@@ -34,21 +35,33 @@ jobs:
         echo "sdk.dir=$ANDROID_SDK_ROOT" >> android/local.properties
         echo "flutter.versionCode=1" >> android/local.properties
         echo "flutter.versionName=1.0.0" >> android/local.properties
+        cat android/local.properties
         
     - name: Setup Android SDK
       run: |
-        # Install Android SDK components
-        $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "platforms;android-34"
-        $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "build-tools;34.0.0"
+        # Install required Android SDK components
+        echo "Installing Android SDK 35 and build tools..."
+        $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "platforms;android-35"
+        $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "build-tools;35.0.0"
         $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "platform-tools"
-        yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses
+        
+        # Accept all licenses non-interactively
+        yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
+        
+        # Verify Flutter doctor
         flutter doctor --verbose
         
     - name: Get dependencies
       run: flutter pub get
       
-    - name: Skip code generation for now
-      run: echo "Skipping code generation due to model issues"
+    - name: Verify pubspec.lock
+      run: |
+        echo "Checking pubspec.lock..."
+        if [ -f pubspec.lock ]; then
+          echo "Dependencies resolved successfully"
+        else
+          echo "Warning: pubspec.lock not found"
+        fi
       
     - name: Analyze code
       run: flutter analyze --no-fatal-infos
@@ -58,38 +71,76 @@ jobs:
       run: flutter test
       continue-on-error: true
       
-    - name: Clean build directory
-      run: flutter clean
-      
-    - name: Get dependencies again
-      run: flutter pub get
-      
+    - name: Clean and prepare build
+      run: |
+        flutter clean
+        flutter pub get
+        
     - name: Build APK (Debug)
-      run: flutter build apk --debug --no-shrink
+      run: |
+        echo "Building debug APK..."
+        flutter build apk --debug --no-shrink --verbose
+        
+    - name: Verify debug build
+      run: |
+        if [ -f build/app/outputs/flutter-apk/app-debug.apk ]; then
+          echo "✅ Debug APK built successfully"
+          ls -la build/app/outputs/flutter-apk/app-debug.apk
+        else
+          echo "❌ Debug APK build failed"
+          exit 1
+        fi
       
     - name: Build APK (Release)
-      run: flutter build apk --release --no-shrink
+      run: |
+        echo "Building release APK..."
+        flutter build apk --release --no-shrink --verbose
+        
+    - name: Verify release build
+      run: |
+        if [ -f build/app/outputs/flutter-apk/app-release.apk ]; then
+          echo "✅ Release APK built successfully"
+          ls -la build/app/outputs/flutter-apk/app-release.apk
+        else
+          echo "❌ Release APK build failed"
+          exit 1
+        fi
       
     - name: Build App Bundle (Release)
-      run: flutter build appbundle --release
-      
+      run: |
+        echo "Building app bundle..."
+        flutter build appbundle --release --verbose
+        
+    - name: Verify app bundle build
+      run: |
+        if [ -f build/app/outputs/bundle/release/app-release.aab ]; then
+          echo "✅ App Bundle built successfully"
+          ls -la build/app/outputs/bundle/release/app-release.aab
+        else
+          echo "❌ App Bundle build failed"
+          exit 1
+        fi
+        
     - name: Upload Debug APK
       uses: actions/upload-artifact@v4
       with:
-        name: debug-apk
+        name: debug-apk-${{ github.sha }}
         path: build/app/outputs/flutter-apk/app-debug.apk
+        retention-days: 30
         
     - name: Upload Release APK
       uses: actions/upload-artifact@v4
       with:
-        name: release-apk
+        name: release-apk-${{ github.sha }}
         path: build/app/outputs/flutter-apk/app-release.apk
+        retention-days: 90
         
     - name: Upload App Bundle
       uses: actions/upload-artifact@v4
       with:
-        name: app-bundle
+        name: app-bundle-${{ github.sha }}
         path: build/app/outputs/bundle/release/app-release.aab
+        retention-days: 90
         
     # Create release if this is a tag push
     - name: Create Release
@@ -103,20 +154,38 @@ jobs:
         body: |
           ## BatchMate Scanner Release ${{ github.ref_name }}
           
-          ### Features
-          - Mobile batch scanning with OCR
-          - Local batch matching
-          - Server integration
-          - Comprehensive logging
+          ### 🚀 Features
+          - 📱 Mobile batch scanning with OCR
+          - 🔍 Local batch matching with fuzzy search
+          - 🔗 Server integration for real-time data
+          - 📊 Comprehensive logging and analytics
+          - 📷 Camera and gallery image scanning
+          - 🔲 QR code scanning support
           
-          ### Downloads
-          - **APK**: Direct installation on Android devices
+          ### 📦 Downloads
+          - **APK**: Direct installation on Android devices (sideload)
           - **AAB**: For Google Play Store distribution
           
-          ### Installation
-          1. Download the APK file
-          2. Enable "Unknown sources" in Android settings
-          3. Install the APK
+          ### 📋 Installation Instructions
+          1. Download the APK file from the assets below
+          2. Enable "Unknown sources" in Android settings:
+             - Settings → Security → Unknown sources (Android 7 and below)
+             - Settings → Apps & notifications → Special app access → Install unknown apps (Android 8+)
+          3. Tap the downloaded APK to install
+          4. Grant camera and storage permissions when prompted
+          
+          ### 🔧 Technical Details
+          - **Min Android Version**: 5.0 (API 21)
+          - **Target Android Version**: 14 (API 35)
+          - **Flutter Version**: 3.24.0
+          - **Architecture**: Universal APK (supports all architectures)
+          
+          ### 🐛 Known Issues
+          - Initial server connection may take a few seconds
+          - OCR accuracy depends on image quality and lighting
+          
+          ### 📞 Support
+          For issues or questions, please create an issue on the GitHub repository.
         draft: false
         prerelease: false
       env:
