@@ -57,6 +57,11 @@ android {
             minifyEnabled false
             shrinkResources false
         }
+        debug {
+            minifyEnabled false
+            shrinkResources false
+            debuggable true
+        }
     }
 }
 
