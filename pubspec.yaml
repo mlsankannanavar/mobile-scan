@@ -20,8 +20,8 @@ dependencies:
   # Camera functionality
   camera: ^0.10.4
   
-  # ML Kit for text recognition
-  google_mlkit_text_recognition: ^0.8.0
+  # ML Kit for text recognition (compatible with AGP 8.x)
+  google_mlkit_text_recognition: ^0.6.0
   
   # Local database
   sqflite: ^2.3.0
