@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
-import 'package:batch_scanner_mobile/services/services.dart';
+import '../services/services.dart';
 import '../models/batch_info.dart';
 import '../models/match_result.dart';
 import '../utils/logger.dart';
