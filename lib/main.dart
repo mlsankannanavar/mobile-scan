@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'screens/connection_screen.dart';
+import 'screens/main_screen.dart';
 import 'services/local_storage_service.dart';
 import 'utils/logger.dart';
 
@@ -51,7 +51,7 @@ class BatchMateApp extends StatelessWidget {
           ),
         ),
       ),
-      home: const ConnectionScreen(),
+      home: MainScreen(),
       debugShowCheckedModeBanner: false,
     );
   }

@@ -80,6 +80,40 @@ class AppLogger {
   static void debug(String message, {Map<String, dynamic>? details}) {
     log(LogLevel.debug, message, details: details);
   }
+
+  // Specialized logging methods for detailed tracking
+  static void apiCall(String method, String endpoint, {Map<String, dynamic>? data}) {
+    final message = '🌐 API $method $endpoint';
+    info(message, details: data);
+  }
+
+  static void apiResponse(String endpoint, int statusCode, {dynamic responseData}) {
+    final status = statusCode >= 200 && statusCode < 300 ? '✅' : '❌';
+    final message = '$status API Response $endpoint | Status: $statusCode';
+    final logLevel = statusCode >= 200 && statusCode < 300 ? LogLevel.info : LogLevel.error;
+    log(logLevel, message, details: responseData is Map ? responseData : {'response': responseData?.toString()});
+  }
+
+  static void connectionStatus(String status, {String? details}) {
+    final message = '🔗 Connection: $status';
+    info(message, details: details != null ? {'details': details} : null);
+  }
+
+  static void scanOperation(String type, String result) {
+    final message = '📱 Scan $type: $result';
+    info(message);
+  }
+
+  static void batchMatch(String extractedText, bool hasMatch, {String? matchDetails}) {
+    final emoji = hasMatch ? '✅' : '❌';
+    final message = '$emoji Batch Match | Text: "$extractedText"';
+    info(message, details: matchDetails != null ? {'matchDetails': matchDetails} : null);
+  }
+
+  static void ocrResult(String imagePath, String extractedText) {
+    final message = '🔍 OCR Result | Image: $imagePath';
+    info(message, details: {'extractedText': extractedText});
+  }
   
   static List<LogEntry> getLogs() => List.unmodifiable(_logs);
   static void clearLogs() => _logs.clear();
