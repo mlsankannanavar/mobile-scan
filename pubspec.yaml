@@ -20,8 +20,8 @@ dependencies:
   # Camera functionality
   camera: ^0.10.4
   
-  # OCR using Tesseract (more compatible than ML Kit)
-  flutter_tesseract_ocr: ^0.4.23
+  # OCR using Google ML Kit (mobile optimized)
+  google_mlkit_text_recognition: ^0.13.0
   
   # Local database
   sqflite: ^2.3.0
