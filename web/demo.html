@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BatchMate Scanner - Web Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            color: #2196F3;
+            margin-bottom: 30px;
+        }
+        .status-card {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #2196F3;
+        }
+        .scan-option {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .scan-option:hover {
+            background: #f0f8ff;
+            border-color: #2196F3;
+        }
+        .scan-option h3 {
+            margin: 10px 0;
+            color: #333;
+        }
+        .scan-option p {
+            color: #666;
+            margin: 0;
+        }
+        .icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 BatchMate Scanner</h1>
+            <p>Mobile Batch Scanning Solution</p>
+        </div>
+        
+        <div class="status-card">
+            <h3>📡 Server Status</h3>
+            <p id="status">🟢 Connected to server successfully</p>
+            <small>Server: test-backend-batchmate.medha-analytics.ai</small>
+        </div>
+        
+        <h2>Scanning Options</h2>
+        
+        <div class="scan-option" onclick="startQRScan()">
+            <div class="icon">📱</div>
+            <h3>Scan QR Code</h3>
+            <p>Scan batch QR codes for instant lookup</p>
+        </div>
+        
+        <div class="scan-option" onclick="startImageScan()">
+            <div class="icon">📷</div>
+            <h3>Scan Image</h3>
+            <p>Capture batch label images for OCR processing</p>
+        </div>
+        
+        <div class="scan-option" onclick="viewLogs()">
+            <div class="icon">📋</div>
+            <h3>View Logs</h3>
+            <p>Check application logs and scan history</p>
+        </div>
+    </div>
+    
+    <script>
+        function startQRScan() {
+            alert('QR Scanner would open here\n\nFeatures:\n• Real-time QR detection\n• Session ID extraction\n• Batch data download');
+        }
+        
+        function startImageScan() {
+            alert('Image Scanner would open here\n\nFeatures:\n• Camera capture or gallery selection\n• Google ML Kit OCR processing\n• Intelligent batch matching\n• Confidence scoring');
+        }
+        
+        function viewLogs() {
+            alert('Logs Screen would open here\n\nFeatures:\n• Application logs\n• OCR results\n• Scan history\n• Error tracking');
+        }
+        
+        // Simulate connection status
+        setInterval(() => {
+            const statusEl = document.getElementById('status');
+            const statuses = [
+                '🟢 Connected to server successfully',
+                '🟠 Testing connection...',
+                '🔴 Connection error - please check network'
+            ];
+            // Mostly show connected status
+            statusEl.textContent = Math.random() > 0.1 ? statuses[0] : statuses[Math.floor(Math.random() * 3)];
+        }, 5000);
+    </script>
+</body>
+</html>

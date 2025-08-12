@@ -12,6 +12,8 @@ final connectionStatusProvider = StateProvider<ConnectionStatus>((ref) => Connec
 enum ConnectionStatus { disconnected, connecting, connected, error }
 
 class MainScreen extends ConsumerStatefulWidget {
+  const MainScreen({super.key});
+
   @override
   ConsumerState<MainScreen> createState() => _MainScreenState();
 }

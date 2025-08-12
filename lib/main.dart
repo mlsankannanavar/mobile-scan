@@ -51,7 +51,7 @@ class BatchMateApp extends StatelessWidget {
           ),
         ),
       ),
-      home: MainScreen(),
+      home: const MainScreen(),
       debugShowCheckedModeBanner: false,
     );
   }
