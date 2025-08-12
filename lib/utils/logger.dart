@@ -81,6 +81,11 @@ class AppLogger {
     log(LogLevel.debug, message, details: details);
   }
 
+  // Convenience method for backward compatibility
+  static void warn(String message, {Map<String, dynamic>? details}) {
+    warning(message, details: details);
+  }
+
   // Specialized logging methods for detailed tracking
   static void apiCall(String method, String endpoint, {Map<String, dynamic>? data}) {
     final message = '🌐 API $method $endpoint';
@@ -91,7 +96,17 @@ class AppLogger {
     final status = statusCode >= 200 && statusCode < 300 ? '✅' : '❌';
     final message = '$status API Response $endpoint | Status: $statusCode';
     final logLevel = statusCode >= 200 && statusCode < 300 ? LogLevel.info : LogLevel.error;
-    log(logLevel, message, details: responseData is Map ? responseData : {'response': responseData?.toString()});
+    Map<String, dynamic>? details;
+    if (responseData != null) {
+      if (responseData is Map<String, dynamic>) {
+        details = responseData;
+      } else if (responseData is Map) {
+        details = Map<String, dynamic>.from(responseData);
+      } else {
+        details = {'response': responseData.toString()};
+      }
+    }
+    log(logLevel, message, details: details);
   }
 
   static void connectionStatus(String status, {String? details}) {

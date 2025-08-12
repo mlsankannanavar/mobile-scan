@@ -37,11 +37,11 @@ class _ImageScannerScreenState extends ConsumerState<ImageScannerScreen> {
   Future<void> _loadAvailableBatches() async {
     try {
       AppLogger.info('[IMAGE_SCANNER] Loading available batches from server');
-      final batches = await _backendService.getFilteredBatches('mobile_session');
+      final batchesMap = await _backendService.getFilteredBatches('mobile_session');
       setState(() {
-        _availableBatches = batches;
+        _availableBatches = batchesMap.values.toList();
       });
-      AppLogger.info('[IMAGE_SCANNER] Loaded ${batches.length} available batches');
+      AppLogger.info('[IMAGE_SCANNER] Loaded ${_availableBatches.length} available batches');
     } catch (e) {
       AppLogger.error('[IMAGE_SCANNER] Failed to load batches: $e');
       setState(() {
@@ -134,19 +134,30 @@ class _ImageScannerScreenState extends ConsumerState<ImageScannerScreen> {
       AppLogger.info('[IMAGE_SCANNER] OCR completed. Extracted text: $extractedText');
 
       if (extractedText.isNotEmpty && _availableBatches.isNotEmpty) {
+        // Convert List<BatchInfo> to Map<String, BatchInfo> for BatchMatcher
+        final batchesMap = <String, BatchInfo>{};
+        for (final batch in _availableBatches) {
+          batchesMap[batch.batchNumber] = batch;
+        }
+        
         // Find batch matches
-        final matchResult = _batchMatcher.findBestMatch(extractedText, _availableBatches);
+        final matchResults = _batchMatcher.findMatches(extractedText, batchesMap);
         
         setState(() {
-          _matchResult = matchResult;
           _isProcessing = false;
           
-          if (matchResult.hasExactMatch) {
-            _statusMessage = 'Exact match found!';
-            AppLogger.info('[IMAGE_SCANNER] ✅ Exact match found: ${matchResult.exactMatch?.batchNumber}');
-          } else if (matchResult.hasFuzzyMatches) {
-            _statusMessage = 'Similar matches found';
-            AppLogger.info('[IMAGE_SCANNER] 🔍 Fuzzy matches found: ${matchResult.fuzzyMatches.length}');
+          if (matchResults.isNotEmpty) {
+            // Get the best match (first one with highest confidence)
+            final bestMatch = matchResults.first;
+            if (bestMatch.confidence >= 95.0) {
+              _statusMessage = 'Exact match found!';
+              AppLogger.info('[IMAGE_SCANNER] ✅ Exact match found: ${bestMatch.batchNumber}');
+            } else {
+              _statusMessage = 'Similar matches found';
+              AppLogger.info('[IMAGE_SCANNER] 🔍 Fuzzy matches found: ${matchResults.length}');
+            }
+            // Store the best match for UI display
+            _matchResult = bestMatch;
           } else {
             _statusMessage = 'No matching batches found';
             AppLogger.warn('[IMAGE_SCANNER] ❌ No matches found for extracted text');
@@ -154,7 +165,9 @@ class _ImageScannerScreenState extends ConsumerState<ImageScannerScreen> {
         });
 
         // Submit result to server
-        await _submitScanResult(extractedText, matchResult);
+        if (matchResults.isNotEmpty) {
+          await _submitScanResult(extractedText, matchResults.first);
+        }
         
       } else {
         setState(() {
@@ -179,14 +192,15 @@ class _ImageScannerScreenState extends ConsumerState<ImageScannerScreen> {
     try {
       AppLogger.info('[IMAGE_SCANNER] Submitting scan result to server');
       
-      await _backendService.submitMobileBatch(
-        sessionId: 'mobile_session',
-        extractedText: extractedText,
-        matchResult: matchResult,
-        scanType: 'image',
-      );
+      // For now, just log the result since we don't have submitMobileBatch method
+      AppLogger.info('[IMAGE_SCANNER] ✅ Scan result logged', details: {
+        'extractedText': extractedText,
+        'matchFound': matchResult.confidence >= 75.0,
+        'batchNumber': matchResult.batchNumber,
+        'confidence': matchResult.confidence,
+        'scanType': 'image',
+      });
       
-      AppLogger.info('[IMAGE_SCANNER] ✅ Scan result submitted successfully');
     } catch (e) {
       AppLogger.error('[IMAGE_SCANNER] Failed to submit scan result: $e');
     }
@@ -310,14 +324,14 @@ class _ImageScannerScreenState extends ConsumerState<ImageScannerScreen> {
                   child: Row(
                     children: [
                       Icon(
-                        _matchResult?.hasExactMatch == true 
+                        _matchResult?.confidence != null && _matchResult!.confidence >= 95.0
                             ? Icons.check_circle 
-                            : _matchResult?.hasFuzzyMatches == true
+                            : _matchResult?.confidence != null && _matchResult!.confidence >= 75.0
                                 ? Icons.search
                                 : Icons.info,
-                        color: _matchResult?.hasExactMatch == true 
+                        color: _matchResult?.confidence != null && _matchResult!.confidence >= 95.0
                             ? Colors.green 
-                            : _matchResult?.hasFuzzyMatches == true
+                            : _matchResult?.confidence != null && _matchResult!.confidence >= 75.0
                                 ? Colors.orange
                                 : Colors.blue,
                       ),
@@ -394,9 +408,9 @@ class _ImageScannerScreenState extends ConsumerState<ImageScannerScreen> {
                       padding: EdgeInsets.all(12),
                       width: double.infinity,
                       decoration: BoxDecoration(
-                        color: _matchResult!.hasExactMatch 
+                        color: _matchResult!.confidence >= 95.0
                             ? Colors.green.shade100
-                            : _matchResult!.hasFuzzyMatches
+                            : _matchResult!.confidence >= 75.0
                                 ? Colors.orange.shade100
                                 : Colors.grey.shade100,
                         borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
@@ -413,7 +427,7 @@ class _ImageScannerScreenState extends ConsumerState<ImageScannerScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          if (_matchResult!.hasExactMatch) ...[
+                          if (_matchResult!.confidence >= 95.0) ...[
                             Text(
                               'Exact Match Found:',
                               style: Theme.of(context).textTheme.titleSmall?.copyWith(
@@ -422,24 +436,27 @@ class _ImageScannerScreenState extends ConsumerState<ImageScannerScreen> {
                               ),
                             ),
                             SizedBox(height: 8),
-                            _buildBatchCard(_matchResult!.exactMatch!, isExact: true),
-                          ],
-                          if (_matchResult!.hasFuzzyMatches) ...[
-                            if (_matchResult!.hasExactMatch) SizedBox(height: 16),
+                            _buildBatchCard(_matchResult!.batchInfo, isExact: true),
+                          ] else if (_matchResult!.confidence >= 75.0) ...[
                             Text(
-                              'Similar Matches:',
+                              'Similar Match Found:',
                               style: Theme.of(context).textTheme.titleSmall?.copyWith(
                                 fontWeight: FontWeight.bold,
                                 color: Colors.orange.shade700,
                               ),
                             ),
                             SizedBox(height: 8),
-                            ..._matchResult!.fuzzyMatches.map((match) => 
-                              Padding(
-                                padding: EdgeInsets.only(bottom: 8),
-                                child: _buildBatchCard(match, isExact: false),
+                            _buildBatchCard(_matchResult!.batchInfo, isExact: false),
+                          ] else ...[
+                            Text(
+                              'Low Confidence Match:',
+                              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.grey.shade700,
                               ),
                             ),
+                            SizedBox(height: 8),
+                            _buildBatchCard(_matchResult!.batchInfo, isExact: false),
                           ],
                         ],
                       ),
@@ -496,10 +513,10 @@ class _ImageScannerScreenState extends ConsumerState<ImageScannerScreen> {
               fontWeight: FontWeight.bold,
             ),
           ),
-          if (batch.productName.isNotEmpty) ...[
+          if (batch.itemName.isNotEmpty) ...[
             SizedBox(height: 4),
             Text(
-              batch.productName,
+              batch.itemName,
               style: Theme.of(context).textTheme.bodySmall,
             ),
           ],
