@@ -135,22 +135,22 @@ class _MainScreenState extends ConsumerState<MainScreen> {
         actions: [
           // Logs button on right edge
           Container(
-            margin: EdgeInsets.only(right: 8),
+            margin: const EdgeInsets.only(right: 8),
             child: IconButton(
               onPressed: _showLogsScreen,
-              icon: Icon(Icons.list_alt, size: 28),
+              icon: const Icon(Icons.list_alt, size: 28),
               tooltip: 'View Logs',
               style: IconButton.styleFrom(
                 backgroundColor: Theme.of(context).colorScheme.secondary,
                 foregroundColor: Theme.of(context).colorScheme.onSecondary,
-                padding: EdgeInsets.all(12),
+                padding: const EdgeInsets.all(12),
               ),
             ),
           ),
         ],
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -158,13 +158,13 @@ class _MainScreenState extends ConsumerState<MainScreen> {
             Card(
               elevation: 4,
               child: Padding(
-                padding: EdgeInsets.all(16),
+                padding: const EdgeInsets.all(16),
                 child: Column(
                   children: [
                     Row(
                       children: [
                         AnimatedSwitcher(
-                          duration: Duration(milliseconds: 300),
+                          duration: const Duration(milliseconds: 300),
                           child: Icon(
                             _getStatusIcon(),
                             key: ValueKey(connectionStatus),
@@ -172,7 +172,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                             size: 32,
                           ),
                         ),
-                        SizedBox(width: 12),
+                        const SizedBox(width: 12),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -196,18 +196,18 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                         if (connectionStatus != ConnectionStatus.connecting)
                           IconButton(
                             onPressed: _testConnection,
-                            icon: Icon(Icons.refresh),
+                            icon: const Icon(Icons.refresh),
                             tooltip: 'Retry Connection',
                           ),
                       ],
                     ),
                     if (_serverInfo.isNotEmpty) ...[
-                      SizedBox(height: 12),
+                      const SizedBox(height: 12),
                       Container(
                         width: double.infinity,
-                        padding: EdgeInsets.all(12),
+                        padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.surfaceVariant,
+                          color: Theme.of(context).colorScheme.surfaceContainerHighest,
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
@@ -221,7 +221,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
               ),
             ),
 
-            SizedBox(height: 24),
+            const SizedBox(height: 24),
 
             // Scanning Options Section
             Text(
@@ -230,7 +230,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
 
             // QR Scanner Card
             Card(
@@ -239,7 +239,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                 onTap: isConnected ? _navigateToQRScanner : null,
                 borderRadius: BorderRadius.circular(12),
                 child: Padding(
-                  padding: EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(20),
                   child: Column(
                     children: [
                       Icon(
@@ -249,7 +249,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                           ? Theme.of(context).colorScheme.primary
                           : Theme.of(context).disabledColor,
                       ),
-                      SizedBox(height: 12),
+                      const SizedBox(height: 12),
                       Text(
                         'Scan QR Code',
                         style: Theme.of(context).textTheme.titleMedium?.copyWith(
@@ -259,7 +259,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                             : Theme.of(context).disabledColor,
                         ),
                       ),
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
                       Text(
                         'Scan batch QR codes for instant lookup',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -275,7 +275,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
               ),
             ),
 
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
 
             // Image Scanner Card
             Card(
@@ -284,7 +284,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                 onTap: isConnected ? _navigateToImageScanner : null,
                 borderRadius: BorderRadius.circular(12),
                 child: Padding(
-                  padding: EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(20),
                   child: Column(
                     children: [
                       Icon(
@@ -294,7 +294,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                           ? Theme.of(context).colorScheme.primary
                           : Theme.of(context).disabledColor,
                       ),
-                      SizedBox(height: 12),
+                      const SizedBox(height: 12),
                       Text(
                         'Scan Image',
                         style: Theme.of(context).textTheme.titleMedium?.copyWith(
@@ -304,7 +304,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                             : Theme.of(context).disabledColor,
                         ),
                       ),
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
                       Text(
                         'Capture batch label images for OCR processing',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -321,9 +321,9 @@ class _MainScreenState extends ConsumerState<MainScreen> {
             ),
 
             if (!isConnected) ...[
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               Container(
-                padding: EdgeInsets.all(12),
+                padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   color: Colors.orange.withOpacity(0.1),
                   border: Border.all(color: Colors.orange),
@@ -331,8 +331,8 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.warning, color: Colors.orange),
-                    SizedBox(width: 8),
+                    const Icon(Icons.warning, color: Colors.orange),
+                    const SizedBox(width: 8),
                     Expanded(
                       child: Text(
                         'Connect to server to enable scanning features',
